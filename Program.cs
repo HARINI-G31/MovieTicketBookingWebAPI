@@ -13,15 +13,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Movie Repository
+// Movie 
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
-
-// Movie Service
 builder.Services.AddScoped<IMovieService, MovieService>();
+//theatre
 
 builder.Services.AddScoped<ITheatreRepository, TheatreRepository>();
-
 builder.Services.AddScoped<ITheatreService, TheatreService>();
+//screens
+builder.Services.AddScoped<IScreenRepository, ScreenRepository>();
+builder.Services.AddScoped<IScreenService, ScreenService>();
 
 
 // Add services to the container.

@@ -87,3 +87,33 @@ Database migration created and applied. API endpoints tested successfully using 
 ## 7. Version Control
 
 Git is used to track development milestones, with changes committed as individual modules and shared features are completed.
+
+## Module Implementation Status
+
+### 1. Movie Module
+- [x] Movie model
+- [x] Movie DTOs
+- [x] Movie repository
+- [x] Movie service
+- [x] Movies controller
+- [x] Database migration
+- [x] CRUD API testing
+
+### 2. Theatre Module
+- [x] Theatre model
+- [x] Theatre DTOs
+- [x] Theatre repository
+- [x] Theatre service
+- [x] Theatres controller
+- [x] Database migration
+- [x] CRUD API testing
+
+### 3. Screen Module
+- [x] Screen model
+- [x] Screen DTOs
+- [x] Screen repository
+- [x] Screen service
+- [x] Screens controller
+- [x] Theatre-Screen relationship
+- [x] Database migration
+- [x] CRUD API testing
