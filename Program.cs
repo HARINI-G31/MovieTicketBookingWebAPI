@@ -29,6 +29,9 @@ builder.Services.AddScoped<ISeatService, SeatService>();
 //shows
 builder.Services.AddScoped<IShowRepository, ShowRepository>();
 builder.Services.AddScoped<IShowService, ShowService>();
+// Show Seats
+builder.Services.AddScoped<IShowSeatRepository, ShowSeatRepository>();
+builder.Services.AddScoped<IShowSeatService, ShowSeatService>();
 
 // Add services to the container.
 

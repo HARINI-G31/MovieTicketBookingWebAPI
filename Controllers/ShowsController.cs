@@ -9,10 +9,14 @@ namespace MovieTicketBookingWebAPI.Controllers;
 public class ShowsController : ControllerBase
 {
     private readonly IShowService _showService;
+    private readonly IShowSeatService _showSeatService;
 
-    public ShowsController(IShowService showService)
+    public ShowsController(
+        IShowService showService,
+        IShowSeatService showSeatService)
     {
         _showService = showService;
+        _showSeatService = showSeatService;
     }
 
     // POST: api/shows
@@ -80,6 +84,33 @@ public class ShowsController : ControllerBase
         var shows = await _showService.GetShowsByDateAsync(date);
 
         return Ok(shows);
+    }
+
+    // GET: api/shows/5/seats
+    [HttpGet("{showId:int}/seats")]
+    public async Task<IActionResult> GetShowSeats(int showId)
+    {
+        var seats = await _showSeatService.GetShowSeatsAsync(showId);
+
+        return Ok(seats);
+    }
+
+    // GET: api/shows/5/seats/available
+    [HttpGet("{showId:int}/seats/available")]
+    public async Task<IActionResult> GetAvailableSeats(int showId)
+    {
+        var seats = await _showSeatService.GetAvailableSeatsAsync(showId);
+
+        return Ok(seats);
+    }
+
+    // GET: api/shows/5/seats/booked
+    [HttpGet("{showId:int}/seats/booked")]
+    public async Task<IActionResult> GetBookedSeats(int showId)
+    {
+        var seats = await _showSeatService.GetBookedSeatsAsync(showId);
+
+        return Ok(seats);
     }
 
     // PUT: api/shows/5

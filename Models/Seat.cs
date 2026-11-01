@@ -14,5 +14,6 @@ public class Seat
     public string SeatType { get; set; } = string.Empty;
 
     public Screen Screen { get; set; } = null!;
+    public ICollection<ShowSeat> ShowSeats { get; set; } = new List<ShowSeat>();
 }
 

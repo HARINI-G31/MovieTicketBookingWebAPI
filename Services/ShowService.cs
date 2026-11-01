@@ -8,10 +8,14 @@ namespace MovieTicketBookingWebAPI.Services;
 public class ShowService : IShowService
 {
     private readonly IShowRepository _showRepository;
+    private readonly IShowSeatService _showSeatService;
 
-    public ShowService(IShowRepository showRepository)
+    public ShowService(
+        IShowRepository showRepository,
+        IShowSeatService showSeatService)
     {
         _showRepository = showRepository;
+        _showSeatService = showSeatService;
     }
 
     public async Task<ShowResponseDto> CreateShowAsync(CreateShowDto dto)
@@ -39,6 +43,10 @@ public class ShowService : IShowService
         };
 
         var createdShow = await _showRepository.AddAsync(show);
+
+        await _showSeatService.InitializeShowSeatsAsync(
+            createdShow.ShowId,
+            createdShow.ScreenId);
 
         return MapToResponseDto(createdShow);
     }

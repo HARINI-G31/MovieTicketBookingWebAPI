@@ -149,3 +149,34 @@ Git is used to track development milestones, with changes committed as individua
 - [x] Get shows by Date
 - [x] Update show API testing
 - [x] Delete show API testing
+
+### ShowSeat Module
+
+**Purpose:** Manages seat availability for individual movie shows.
+
+**Entity:**
+- ShowSeatId (Primary Key)
+- ShowId (Foreign Key)
+- SeatId (Foreign Key)
+- Status (Available / Booked)
+
+**Relationships:**
+- Each ShowSeat belongs to one Show.
+- Each ShowSeat belongs to one physical Seat.
+- A unique constraint on (ShowId, SeatId) prevents duplicate seat records for the same show.
+
+**Automatic Seat Initialization:**
+- When a new show is created, the system retrieves all physical seats belonging to its screen.
+- It creates one ShowSeat record for each physical seat.
+- Every newly created ShowSeat starts with status `Available`.
+- Clients do not manually create ShowSeat records.
+
+**API Endpoints:**
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/shows/{showId}/seats` | Get all seats for a show |
+| GET | `/api/shows/{showId}/seats/available` | Get available seats |
+| GET | `/api/shows/{showId}/seats/booked` | Get booked seats |
+
+**Testing:** Automatic seat initialization and all three GET endpoints tested successfully using Postman.

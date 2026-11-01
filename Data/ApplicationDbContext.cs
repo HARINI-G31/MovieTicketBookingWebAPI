@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Screen> Screens { get; set; }
     public DbSet<Seat> Seats { get; set; }
     public DbSet<Show> Shows { get; set; }
+    public DbSet<ShowSeat> ShowSeats { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -153,6 +154,28 @@ public class ApplicationDbContext : DbContext
                     "CK_Shows_TicketPrice",
                     "[TicketPrice] >= 0");
             });
+        });
+        // ShowSeat Configuration
+        modelBuilder.Entity<ShowSeat>(entity =>
+        {
+            entity.HasKey(ss => ss.ShowSeatId);
+
+            entity.Property(ss => ss.Status)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.HasOne(ss => ss.Show)
+                .WithMany(s => s.ShowSeats)
+                .HasForeignKey(ss => ss.ShowId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(ss => ss.Seat)
+                .WithMany(s => s.ShowSeats)
+                .HasForeignKey(ss => ss.SeatId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(ss => new { ss.ShowId, ss.SeatId })
+                .IsUnique();
         });
     }
 }

@@ -159,6 +159,35 @@ namespace MovieTicketBookingWebAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MovieTicketBookingWebAPI.Models.ShowSeat", b =>
+                {
+                    b.Property<int>("ShowSeatId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShowSeatId"));
+
+                    b.Property<int>("SeatId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShowId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("ShowSeatId");
+
+                    b.HasIndex("SeatId");
+
+                    b.HasIndex("ShowId", "SeatId")
+                        .IsUnique();
+
+                    b.ToTable("ShowSeats");
+                });
+
             modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Theatre", b =>
                 {
                     b.Property<int>("TheatreId")
@@ -223,6 +252,25 @@ namespace MovieTicketBookingWebAPI.Migrations
                     b.Navigation("Screen");
                 });
 
+            modelBuilder.Entity("MovieTicketBookingWebAPI.Models.ShowSeat", b =>
+                {
+                    b.HasOne("MovieTicketBookingWebAPI.Models.Seat", "Seat")
+                        .WithMany("ShowSeats")
+                        .HasForeignKey("SeatId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MovieTicketBookingWebAPI.Models.Show", "Show")
+                        .WithMany("ShowSeats")
+                        .HasForeignKey("ShowId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Seat");
+
+                    b.Navigation("Show");
+                });
+
             modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Movie", b =>
                 {
                     b.Navigation("Shows");
@@ -233,6 +281,16 @@ namespace MovieTicketBookingWebAPI.Migrations
                     b.Navigation("Seats");
 
                     b.Navigation("Shows");
+                });
+
+            modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Seat", b =>
+                {
+                    b.Navigation("ShowSeats");
+                });
+
+            modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Show", b =>
+                {
+                    b.Navigation("ShowSeats");
                 });
 
             modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Theatre", b =>
