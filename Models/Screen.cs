@@ -13,5 +13,5 @@ public class Screen
     public Theatre Theatre { get; set; } = null!;
 
     // Collection navigation property
-    //public ICollection<Seat> Seats { get; set; } = new List<Seat>();
+    public ICollection<Seat> Seats { get; set; } = new List<Seat>();
 }

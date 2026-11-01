@@ -23,7 +23,9 @@ builder.Services.AddScoped<ITheatreService, TheatreService>();
 //screens
 builder.Services.AddScoped<IScreenRepository, ScreenRepository>();
 builder.Services.AddScoped<IScreenService, ScreenService>();
-
+//Seats
+builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+builder.Services.AddScoped<ISeatService, SeatService>();
 
 // Add services to the container.
 

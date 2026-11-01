@@ -87,6 +87,41 @@ namespace MovieTicketBookingWebAPI.Migrations
                     b.ToTable("Screens");
                 });
 
+            modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Seat", b =>
+                {
+                    b.Property<int>("SeatId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SeatId"));
+
+                    b.Property<string>("RowName")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<int>("ScreenId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SeatNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeatType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("SeatId");
+
+                    b.HasIndex("ScreenId", "RowName", "SeatNumber")
+                        .IsUnique();
+
+                    b.ToTable("Seats", t =>
+                        {
+                            t.HasCheckConstraint("CK_Seats_SeatNumber", "[SeatNumber] > 0");
+                        });
+                });
+
             modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Theatre", b =>
                 {
                     b.Property<int>("TheatreId")
@@ -119,6 +154,22 @@ namespace MovieTicketBookingWebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Theatre");
+                });
+
+            modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Seat", b =>
+                {
+                    b.HasOne("MovieTicketBookingWebAPI.Models.Screen", "Screen")
+                        .WithMany("Seats")
+                        .HasForeignKey("ScreenId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Screen");
+                });
+
+            modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Screen", b =>
+                {
+                    b.Navigation("Seats");
                 });
 
             modelBuilder.Entity("MovieTicketBookingWebAPI.Models.Theatre", b =>

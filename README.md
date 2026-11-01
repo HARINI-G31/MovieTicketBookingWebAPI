@@ -117,3 +117,16 @@ Git is used to track development milestones, with changes committed as individua
 - [x] Theatre-Screen relationship
 - [x] Database migration
 - [x] CRUD API testing
+
+
+### 4. Seat Module
+- [x] Seat model
+- [x] Seat DTOs
+- [x] Seat repository
+- [x] Seat service
+- [x] Seats controller
+- [x] Single seat creation
+- [x] Bulk seat creation
+- [x] Screen-Seat relationship
+- [x] Database constraints and migration
+- [x] CRUD API testing
