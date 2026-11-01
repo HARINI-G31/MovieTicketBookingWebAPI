@@ -130,3 +130,22 @@ Git is used to track development milestones, with changes committed as individua
 - [x] Screen-Seat relationship
 - [x] Database constraints and migration
 - [x] CRUD API testing
+
+### 5. Show Module
+- [x] Show model
+- [x] Show DTOs
+- [x] Show repository
+- [x] Show service
+- [x] Shows controller
+- [x] Movie-Show relationship
+- [x] Screen-Show relationship
+- [x] Show scheduling overlap check
+- [x] Database constraints and migration
+- [x] Create show API testing
+- [x] Get all shows with filters
+- [x] Get show by ID
+- [x] Get shows by Movie ID
+- [x] Get shows by Theatre ID
+- [x] Get shows by Date
+- [x] Update show API testing
+- [x] Delete show API testing

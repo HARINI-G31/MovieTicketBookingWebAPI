@@ -14,4 +14,6 @@ public class Screen
 
     // Collection navigation property
     public ICollection<Seat> Seats { get; set; } = new List<Seat>();
+    public ICollection<Show> Shows { get; set; } = new List<Show>();
+
 }

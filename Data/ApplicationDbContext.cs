@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Theatre> Theatres { get; set; }
     public DbSet<Screen> Screens { get; set; }
     public DbSet<Seat> Seats { get; set; }
+    public DbSet<Show> Shows { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -115,6 +116,43 @@ public class ApplicationDbContext : DbContext
                 s.RowName,
                 s.SeatNumber
             }).IsUnique();
+        });
+        modelBuilder.Entity<Show>(entity =>
+        {
+            entity.HasKey(s => s.ShowId);
+
+            entity.Property(s => s.StartTime)
+                .IsRequired()
+                .HasColumnType("datetime2");
+
+            entity.Property(s => s.EndTime)
+                .IsRequired()
+                .HasColumnType("datetime2");
+
+            entity.Property(s => s.TicketPrice)
+                .HasColumnType("decimal(10,2)")
+                .IsRequired();
+
+            entity.HasOne(s => s.Movie)
+                .WithMany(m => m.Shows)
+                .HasForeignKey(s => s.MovieId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(s => s.Screen)
+                .WithMany(sc => sc.Shows)
+                .HasForeignKey(s => s.ScreenId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint(
+                    "CK_Shows_EndTime",
+                    "[EndTime] > [StartTime]");
+
+                t.HasCheckConstraint(
+                    "CK_Shows_TicketPrice",
+                    "[TicketPrice] >= 0");
+            });
         });
     }
 }
