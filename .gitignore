@@ -1,0 +1,50 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Test results
+TestResults/
+coverage/
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+secrets.json
+
+# Publish output
+publish/
+artifacts/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
