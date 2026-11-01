@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Movie> Movies { get; set; }
+    public DbSet<Theatre> Theatres { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,6 +50,19 @@ public class ApplicationDbContext : DbContext
                     "CK_Movies_DurationMinutes",
                     "[DurationMinutes] > 0");
             });
+        });
+
+        modelBuilder.Entity<Theatre>(entity =>
+        {
+            entity.HasKey(t => t.TheatreId);
+
+            entity.Property(t => t.Name)
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(t => t.Location)
+                .HasMaxLength(200)
+                .IsRequired();
         });
     }
 }

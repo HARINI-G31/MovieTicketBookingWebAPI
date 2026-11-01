@@ -2,50 +2,35 @@
 
 ## 1. Project Overview
 
-The Movie Ticket Booking System is an ASP.NET Core Web API application developed using .NET 10.
+The Movie Ticket Booking System is an ASP.NET Core Web API application designed to manage movies, theatres, screens, seats, shows, and customer bookings.
 
-The application allows users to manage movies, theatres, screens, seats, shows, and movie ticket bookings.
-
-The application uses SQL Server as its database and Entity Framework Core for database operations.
+The application follows a layered architecture to separate API endpoints, business logic, and database operations.
 
 ## 2. Technology Stack
 
-- Framework: ASP.NET Core Web API (.NET 10)
-- Programming Language: C#
-- ORM: Entity Framework Core 10
-- Database: Microsoft SQL Server
-- API Testing: Postman
-- Version Control: Git and GitHub
+- ASP.NET Core Web API (.NET 10)
+- Entity Framework Core 10
+- SQL Server Express
+- C#
+- Postman for API testing
+- Git and GitHub for version control
 
-## 3. Architecture
+## 3. Project Architecture
 
-The application follows a layered architecture.
+The application follows this structure:
 
-Controller → Service → Repository → DbContext → SQL Server
-
-### Controllers
-Handle incoming HTTP requests and return appropriate HTTP responses.
-
-### Services
-Handle application business logic and DTO mapping.
-
-### Repositories
-Handle database operations using Entity Framework Core.
-
-### Models
-Represent the application's database entities.
-
-### DTOs
-Define the request and response data exchanged through API endpoints.
-
-### Data
-Contains the ApplicationDbContext used for database communication.
+- **Controllers:** Handle HTTP requests and responses.
+- **Services:** Contain application business logic.
+- **Repositories:** Handle database operations.
+- **Models:** Represent database entities.
+- **DTOs:** Define API request and response objects.
+- **Data:** Contains the Entity Framework Core DbContext.
 
 ## 4. Database
 
-Database Name: MovieTicketBookingDB
+Database name: `MovieTicketBookingDB`
 
-The planned database contains eight main tables:
+The planned database contains eight tables:
 
 1. Movies
 2. Theatres
@@ -58,30 +43,47 @@ The planned database contains eight main tables:
 
 ## 5. Development Progress
 
-### Completed: Initial Movie Module
+### Movie Module — Completed
 
-- Movie entity created.
-- ApplicationDbContext configured for Movies.
-- Movie DTOs created.
-- Movie repository interface and implementation created.
-- Movie service interface and implementation created.
-- MoviesController created.
-- Dependency injection configured.
-- SQL Server connection configured.
-- Initial EF Core migration created and applied.
-- Movie CRUD and title search endpoints tested using Postman.
+Implemented operations:
 
-### Planned Improvements
+- Create Movie
+- Get All Movies
+- Get Movie by ID
+- Update Movie
+- Delete Movie
+- Search Movies by Title
 
-- Pagination and optional title filtering.
-- Input validation.
-- Improved error handling.
-- Movie deletion protection when dependent shows exist.
+Database migration created and applied. API endpoints tested successfully using Postman.
+
+### Theatre Module — Completed
+
+Implemented operations:
+
+- Create Theatre
+- Get All Theatres
+- Get Theatre by ID
+- Update Theatre
+- Delete Theatre
+
+Database migration created and applied. API endpoints tested successfully using Postman.
 
 ### Upcoming Modules
 
-- Theatres
-- Screens
-- Seats
-- Shows
-- Bookings
+- Screen Module
+- Seat Module
+- Show Module
+- ShowSeat Management
+- Booking Module
+
+## 6. Planned Improvements
+
+- Pagination for list endpoints
+- Input validation
+- Global exception handling
+- Entity relationships and navigation properties
+- Additional business-rule validation
+
+## 7. Version Control
+
+Git is used to track development milestones, with changes committed as individual modules and shared features are completed.
