@@ -180,3 +180,45 @@ Git is used to track development milestones, with changes committed as individua
 | GET | `/api/shows/{showId}/seats/booked` | Get booked seats |
 
 **Testing:** Automatic seat initialization and all three GET endpoints tested successfully using Postman.
+
+## 8. Booking Module
+
+The Booking module manages customer movie ticket bookings and cancellations.
+
+### Entities
+- Booking
+- BookingSeat
+
+### Features
+- Create a booking for a selected show.
+- Select multiple available seats.
+- Generate a unique booking reference.
+- Calculate the total booking amount on the server.
+- Store individual seat prices.
+- Automatically mark selected seats as Booked.
+- Retrieve all bookings.
+- Filter bookings by ShowId and Status.
+- Retrieve booking details by BookingId.
+- Retrieve bookings by ShowId.
+- Cancel confirmed bookings.
+- Automatically release seats after cancellation.
+- Preserve booking history.
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/bookings | Create booking |
+| GET | /api/bookings | Get all bookings |
+| GET | /api/bookings?showId=2 | Filter by show |
+| GET | /api/bookings?status=Confirmed | Filter by status |
+| GET | /api/bookings/{id} | Get booking by ID |
+| GET | /api/bookings/show/{showId} | Get bookings by show |
+| PUT | /api/bookings/{id}/cancel | Cancel booking |
+
+### Database Tables
+- Bookings
+- BookingSeats
+
+### Transaction Handling
+Basic database transactions are used when creating and cancelling bookings to maintain consistency across booking records and show-seat availability.

@@ -19,4 +19,5 @@ public class Show
 
     public Screen Screen { get; set; } = null!;
     public ICollection<ShowSeat> ShowSeats { get; set; } = new List<ShowSeat>();
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }
