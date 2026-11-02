@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieTicketBookingWebAPI.DTOs.Theatres;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Controllers;
 
@@ -28,10 +29,11 @@ public class TheatresController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllTheatres()
+    [HttpGet]
+    public async Task<IActionResult> GetAllTheatres(
+    [FromQuery] PaginationParams paginationParams)
     {
-        var theatres = await _theatreService.GetAllTheatresAsync();
-
+        var theatres = await _theatreService.GetAllTheatresAsync(paginationParams);
         return Ok(theatres);
     }
 

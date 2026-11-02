@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieTicketBookingWebAPI.DTOs.Screens;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Controllers;
+
 
 [Route("api/[controller]")]
 [ApiController]
@@ -28,10 +30,11 @@ public class ScreensController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllScreens()
+    [HttpGet]
+    public async Task<IActionResult> GetAllScreens(
+    [FromQuery] PaginationParams paginationParams)
     {
-        var screens = await _screenService.GetAllScreensAsync();
-
+        var screens = await _screenService.GetAllScreensAsync(paginationParams);
         return Ok(screens);
     }
 
@@ -46,10 +49,13 @@ public class ScreensController : ControllerBase
         return Ok(screen);
     }
 
-    [HttpGet("theatre/{theatreId}")]
-    public async Task<IActionResult> GetScreensByTheatreId(int theatreId)
+    [HttpGet("theatre/{theatreId:int}")]
+    public async Task<IActionResult> GetScreensByTheatreId(
+    int theatreId,
+    [FromQuery] PaginationParams paginationParams)
     {
-        var screens = await _screenService.GetScreensByTheatreIdAsync(theatreId);
+        var screens = await _screenService.GetScreensByTheatreIdAsync(
+            theatreId, paginationParams);
 
         return Ok(screens);
     }

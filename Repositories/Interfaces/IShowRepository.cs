@@ -1,4 +1,5 @@
 ﻿using MovieTicketBookingWebAPI.Models;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Repositories.Interfaces;
 
@@ -6,18 +7,27 @@ public interface IShowRepository
 {
     Task<Show> AddAsync(Show show);
 
-    Task<List<Show>> GetAllAsync(
-        DateTime? date,
-        int? movieId,
-        int? theatreId);
-
+    
     Task<Show?> GetByIdAsync(int showId);
 
-    Task<List<Show>> GetByMovieIdAsync(int movieId);
 
-    Task<List<Show>> GetByTheatreIdAsync(int theatreId);
+    Task<PagedResponseDto<Show>> GetAllAsync(
+    DateTime? date,
+    int? movieId,
+    int? theatreId,
+    PaginationParams paginationParams);
 
-    Task<List<Show>> GetByDateAsync(DateTime date);
+    Task<PagedResponseDto<Show>> GetByMovieIdAsync(
+        int movieId,
+        PaginationParams paginationParams);
+
+    Task<PagedResponseDto<Show>> GetByTheatreIdAsync(
+        int theatreId,
+        PaginationParams paginationParams);
+
+    Task<PagedResponseDto<Show>> GetByDateAsync(
+        DateTime date,
+        PaginationParams paginationParams);
     Task<List<Show>> GetByScreenIdAsync(int screenId);
 
     Task UpdateAsync(Show show);

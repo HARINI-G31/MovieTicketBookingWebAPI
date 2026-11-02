@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using MovieTicketBookingWebAPI.Data;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
+using MovieTicketBookingWebAPI.Extensions;
 
 namespace MovieTicketBookingWebAPI.Repositories;
 
@@ -31,12 +33,17 @@ public class SeatRepository : ISeatRepository
         return seats;
     }
 
-    public async Task<List<Seat>> GetByScreenIdAsync(int screenId)
+    public async Task<PagedResponseDto<Seat>> GetByScreenIdAsync(
+    int screenId,
+    PaginationParams paginationParams)
     {
-        return await _context.Seats
+        var query = _context.Seats
             .AsNoTracking()
-            .Where(s => s.ScreenId == screenId)
-            .ToListAsync();
+            .Where(seat => seat.ScreenId == screenId)
+            .OrderBy(seat => seat.RowName)
+            .ThenBy(seat => seat.SeatNumber);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
     public async Task<Seat?> GetByIdAsync(int seatId)
@@ -55,5 +62,14 @@ public class SeatRepository : ISeatRepository
     {
         _context.Seats.Remove(seat);
         await _context.SaveChangesAsync();
+    }
+    public async Task<List<Seat>> GetAllByScreenIdAsync(int screenId)
+    {
+        return await _context.Seats
+            .AsNoTracking()
+            .Where(seat => seat.ScreenId == screenId)
+            .OrderBy(seat => seat.RowName)
+            .ThenBy(seat => seat.SeatNumber)
+            .ToListAsync();
     }
 }

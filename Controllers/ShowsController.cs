@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieTicketBookingWebAPI.DTOs.Shows;
 using MovieTicketBookingWebAPI.Services.Interfaces;
-
+using MovieTicketBookingWebAPI.DTOs.Common;
 namespace MovieTicketBookingWebAPI.Controllers;
 
 [Route("api/[controller]")]
@@ -33,13 +33,15 @@ public class ShowsController : ControllerBase
 
     // GET: api/shows
     [HttpGet]
+    [HttpGet]
     public async Task<IActionResult> GetAllShows(
-        [FromQuery] DateTime? date,
-        [FromQuery] int? movieId,
-        [FromQuery] int? theatreId)
+    [FromQuery] DateTime? date,
+    [FromQuery] int? movieId,
+    [FromQuery] int? theatreId,
+    [FromQuery] PaginationParams paginationParams)
     {
         var shows = await _showService.GetAllShowsAsync(
-            date, movieId, theatreId);
+            date, movieId, theatreId, paginationParams);
 
         return Ok(shows);
     }
@@ -60,18 +62,24 @@ public class ShowsController : ControllerBase
 
     // GET: api/shows/movie/5
     [HttpGet("movie/{movieId:int}")]
-    public async Task<IActionResult> GetShowsByMovie(int movieId)
+    public async Task<IActionResult> GetShowsByMovieId(
+    int movieId,
+    [FromQuery] PaginationParams paginationParams)
     {
-        var shows = await _showService.GetShowsByMovieIdAsync(movieId);
+        var shows = await _showService.GetShowsByMovieIdAsync(
+            movieId, paginationParams);
 
         return Ok(shows);
     }
 
     // GET: api/shows/theatre/5
     [HttpGet("theatre/{theatreId:int}")]
-    public async Task<IActionResult> GetShowsByTheatre(int theatreId)
+    public async Task<IActionResult> GetShowsByTheatreId(
+    int theatreId,
+    [FromQuery] PaginationParams paginationParams)
     {
-        var shows = await _showService.GetShowsByTheatreIdAsync(theatreId);
+        var shows = await _showService.GetShowsByTheatreIdAsync(
+            theatreId, paginationParams);
 
         return Ok(shows);
     }
@@ -79,9 +87,11 @@ public class ShowsController : ControllerBase
     // GET: api/shows/search?date=2026-11-01
     [HttpGet("search")]
     public async Task<IActionResult> GetShowsByDate(
-        [FromQuery] DateTime date)
+    [FromQuery] DateTime date,
+    [FromQuery] PaginationParams paginationParams)
     {
-        var shows = await _showService.GetShowsByDateAsync(date);
+        var shows = await _showService.GetShowsByDateAsync(
+            date, paginationParams);
 
         return Ok(shows);
     }

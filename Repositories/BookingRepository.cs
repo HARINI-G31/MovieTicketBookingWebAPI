@@ -2,6 +2,8 @@
 using MovieTicketBookingWebAPI.Data;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
+using MovieTicketBookingWebAPI.Extensions;
 
 namespace MovieTicketBookingWebAPI.Repositories;
 
@@ -65,13 +67,23 @@ public class BookingRepository : IBookingRepository
         }
     }
 
-    public async Task<List<Booking>> GetAllAsync(
-        int? showId,
-        string? status)
+    
+
+    public async Task<Booking?> GetByIdAsync(int bookingId)
     {
-        var query = _context.Bookings
+        return await _context.Bookings
             .Include(b => b.BookingSeats)
                 .ThenInclude(bs => bs.Seat)
+            .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+    }
+
+    public async Task<PagedResponseDto<Booking>> GetAllAsync(
+    int? showId,
+    string? status,
+    PaginationParams paginationParams)
+    {
+        var query = _context.Bookings
+            .AsNoTracking()
             .AsQueryable();
 
         if (showId.HasValue)
@@ -84,27 +96,28 @@ public class BookingRepository : IBookingRepository
             query = query.Where(b => b.Status == status);
         }
 
-        return await query
+        query = query
+            .Include(b => b.BookingSeats)
+                .ThenInclude(bs => bs.Seat)
             .OrderByDescending(b => b.BookingDate)
-            .ToListAsync();
+            .ThenByDescending(b => b.BookingId);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
-    public async Task<Booking?> GetByIdAsync(int bookingId)
+    public async Task<PagedResponseDto<Booking>> GetByShowIdAsync(
+        int showId,
+        PaginationParams paginationParams)
     {
-        return await _context.Bookings
-            .Include(b => b.BookingSeats)
-                .ThenInclude(bs => bs.Seat)
-            .FirstOrDefaultAsync(b => b.BookingId == bookingId);
-    }
-
-    public async Task<List<Booking>> GetByShowIdAsync(int showId)
-    {
-        return await _context.Bookings
-            .Include(b => b.BookingSeats)
-                .ThenInclude(bs => bs.Seat)
+        var query = _context.Bookings
+            .AsNoTracking()
             .Where(b => b.ShowId == showId)
+            .Include(b => b.BookingSeats)
+                .ThenInclude(bs => bs.Seat)
             .OrderByDescending(b => b.BookingDate)
-            .ToListAsync();
+            .ThenByDescending(b => b.BookingId);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
     public async Task CancelAsync(

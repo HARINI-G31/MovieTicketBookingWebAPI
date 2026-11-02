@@ -3,11 +3,14 @@ using MovieTicketBookingWebAPI.DTOs.Theatres;
 
 namespace MovieTicketBookingWebAPI.Services.Interfaces;
 
+using MovieTicketBookingWebAPI.DTOs.Common;
+
 public interface ITheatreService
 {
     Task<TheatreResponseDto> CreateTheatreAsync(CreateTheatreDto theatreDto);
 
-    Task<List<TheatreResponseDto>> GetAllTheatresAsync();
+    Task<PagedResponseDto<TheatreResponseDto>> GetAllTheatresAsync(
+    PaginationParams paginationParams);
 
     Task<TheatreResponseDto?> GetTheatreByIdAsync(int theatreId);
 

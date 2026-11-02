@@ -21,7 +21,7 @@ public class ShowSeatService : IShowSeatService
     // Initialize all seats for a newly created show
     public async Task InitializeShowSeatsAsync(int showId, int screenId)
     {
-        var seats = await _seatRepository.GetByScreenIdAsync(screenId);
+        var seats = await _seatRepository.GetAllByScreenIdAsync(screenId);
 
         var showSeats = seats.Select(seat => new ShowSeat
         {

@@ -222,3 +222,78 @@ The Booking module manages customer movie ticket bookings and cancellations.
 
 ### Transaction Handling
 Basic database transactions are used when creating and cancelling bookings to maintain consistency across booking records and show-seat availability.
+## Pagination
+
+### Overview
+
+Pagination is implemented for collection/list API endpoints to retrieve records in smaller, manageable pages instead of returning the entire dataset.
+
+The implementation uses reusable pagination components:
+
+- `DTOs/Common/PaginationParams.cs` – Accepts and validates pagination query parameters.
+- `DTOs/Common/PagedResponseDto.cs` – Defines the standard paginated response structure.
+- `Extensions/PaginationExtensions.cs` – Provides reusable Entity Framework Core pagination logic.
+
+### Pagination Parameters
+
+Paginated endpoints accept the following query parameters:
+
+| Parameter | Default | Description |
+|---|---:|---|
+| `pageNumber` | 1 | Page number to retrieve |
+| `pageSize` | 10 | Number of records per page |
+
+Validation rules:
+
+- Page number cannot be less than 1.
+- Page size defaults to 10 when less than 1.
+- Maximum page size is restricted to 100.
+
+### Example Requests
+
+```http
+GET /api/movies?pageNumber=1&pageSize=10
+GET /api/theatres?pageNumber=2&pageSize=5
+GET /api/screens?pageNumber=1&pageSize=10
+GET /api/seats/screen/1?pageNumber=1&pageSize=20
+GET /api/shows?pageNumber=1&pageSize=10
+GET /api/bookings?pageNumber=1&pageSize=10
+```
+
+Endpoints that support filtering can combine filters with pagination parameters.
+
+### Standard Paginated Response
+
+Example:
+
+```json
+{
+  "data": [],
+  "pageNumber": 1,
+  "pageSize": 10,
+  "totalRecords": 25,
+  "totalPages": 3
+}
+```
+
+| Property | Description |
+|---|---|
+| `data` | Records in the current page |
+| `pageNumber` | Current page number |
+| `pageSize` | Maximum records per page |
+| `totalRecords` | Total matching records |
+| `totalPages` | Total number of available pages |
+
+### Implementation Details
+
+- Pagination is performed at the database query level using Entity Framework Core.
+- Records are ordered before pagination to provide consistent results.
+- Repository methods return paginated entity results.
+- Service methods map entities into response DTOs while preserving pagination metadata.
+- Controllers accept pagination parameters through query strings.
+
+### Notes
+
+- Pagination does not apply to internal queries that require the complete dataset, such as retrieving all physical seats when initializing show-seat availability.
+- Movie title search uses a dedicated repository query and is independent of the movie listing page size.
+- Pagination does not require database schema changes, so no EF Core migration is needed solely for this feature.

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieTicketBookingWebAPI.DTOs.Seats;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Controllers;
 
@@ -36,10 +37,13 @@ public class SeatsController : ControllerBase
         return Ok(seats);
     }
 
-    [HttpGet("screen/{screenId}")]
-    public async Task<IActionResult> GetSeatsByScreenId(int screenId)
+    [HttpGet("screen/{screenId:int}")]
+    public async Task<IActionResult> GetSeatsByScreenId(
+    int screenId,
+    [FromQuery] PaginationParams paginationParams)
     {
-        var seats = await _seatService.GetSeatsByScreenIdAsync(screenId);
+        var seats = await _seatService.GetSeatsByScreenIdAsync(
+            screenId, paginationParams);
 
         return Ok(seats);
     }

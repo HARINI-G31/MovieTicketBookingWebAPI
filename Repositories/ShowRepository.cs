@@ -2,6 +2,8 @@
 using MovieTicketBookingWebAPI.Data;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
+using MovieTicketBookingWebAPI.Extensions;
 
 namespace MovieTicketBookingWebAPI.Repositories;
 
@@ -22,21 +24,29 @@ public class ShowRepository : IShowRepository
         return show;
     }
 
-    public async Task<List<Show>> GetAllAsync(
-        DateTime? date,
-        int? movieId,
-        int? theatreId)
+   
+
+    public async Task<Show?> GetByIdAsync(int showId)
     {
-        var query = _context.Shows.AsNoTracking().AsQueryable();
+        return await _context.Shows
+            .FirstOrDefaultAsync(s => s.ShowId == showId);
+    }
+
+
+
+    public async Task<PagedResponseDto<Show>> GetAllAsync(
+    DateTime? date,
+    int? movieId,
+    int? theatreId,
+    PaginationParams paginationParams)
+    {
+        var query = _context.Shows
+            .AsNoTracking()
+            .AsQueryable();
 
         if (date.HasValue)
         {
-            var startDate = date.Value.Date;
-            var endDate = startDate.AddDays(1);
-
-            query = query.Where(s =>
-                s.StartTime >= startDate &&
-                s.StartTime < endDate);
+            query = query.Where(s => s.StartTime.Date == date.Value.Date);
         }
 
         if (movieId.HasValue)
@@ -46,51 +56,48 @@ public class ShowRepository : IShowRepository
 
         if (theatreId.HasValue)
         {
-            query = query.Where(s =>
-                s.Screen.TheatreId == theatreId.Value);
+            query = query.Where(s => s.Screen.TheatreId == theatreId.Value);
         }
 
-        return await query
-            .OrderBy(s => s.StartTime)
-            .ToListAsync();
+        query = query.OrderBy(s => s.StartTime);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
-    public async Task<Show?> GetByIdAsync(int showId)
+    public async Task<PagedResponseDto<Show>> GetByMovieIdAsync(
+        int movieId,
+        PaginationParams paginationParams)
     {
-        return await _context.Shows
-            .FirstOrDefaultAsync(s => s.ShowId == showId);
-    }
-
-    public async Task<List<Show>> GetByMovieIdAsync(int movieId)
-    {
-        return await _context.Shows
+        var query = _context.Shows
             .AsNoTracking()
             .Where(s => s.MovieId == movieId)
-            .OrderBy(s => s.StartTime)
-            .ToListAsync();
+            .OrderBy(s => s.StartTime);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
-    public async Task<List<Show>> GetByTheatreIdAsync(int theatreId)
+    public async Task<PagedResponseDto<Show>> GetByTheatreIdAsync(
+        int theatreId,
+        PaginationParams paginationParams)
     {
-        return await _context.Shows
+        var query = _context.Shows
             .AsNoTracking()
             .Where(s => s.Screen.TheatreId == theatreId)
-            .OrderBy(s => s.StartTime)
-            .ToListAsync();
+            .OrderBy(s => s.StartTime);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
-    public async Task<List<Show>> GetByDateAsync(DateTime date)
+    public async Task<PagedResponseDto<Show>> GetByDateAsync(
+        DateTime date,
+        PaginationParams paginationParams)
     {
-        var startDate = date.Date;
-        var endDate = startDate.AddDays(1);
-
-        return await _context.Shows
+        var query = _context.Shows
             .AsNoTracking()
-            .Where(s =>
-                s.StartTime >= startDate &&
-                s.StartTime < endDate)
-            .OrderBy(s => s.StartTime)
-            .ToListAsync();
+            .Where(s => s.StartTime.Date == date.Date)
+            .OrderBy(s => s.StartTime);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
     public async Task UpdateAsync(Show show)

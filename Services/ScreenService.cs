@@ -3,6 +3,7 @@ using MovieTicketBookingWebAPI.DTOs.Screens;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Services;
 
@@ -28,11 +29,25 @@ public class ScreenService : IScreenService
         return MapToResponseDto(createdScreen);
     }
 
-    public async Task<List<ScreenResponseDto>> GetAllScreensAsync()
+    public async Task<PagedResponseDto<ScreenResponseDto>> GetAllScreensAsync(
+    PaginationParams paginationParams)
     {
-        var screens = await _screenRepository.GetAllAsync();
+        var pagedScreens = await _screenRepository.GetAllAsync(paginationParams);
 
-        return screens.Select(MapToResponseDto).ToList();
+        return new PagedResponseDto<ScreenResponseDto>
+        {
+            Data = pagedScreens.Data.Select(screen => new ScreenResponseDto
+            {
+                ScreenId = screen.ScreenId,
+                TheatreId = screen.TheatreId,
+                ScreenName = screen.ScreenName
+            }).ToList(),
+
+            PageNumber = pagedScreens.PageNumber,
+            PageSize = pagedScreens.PageSize,
+            TotalRecords = pagedScreens.TotalRecords,
+            TotalPages = pagedScreens.TotalPages
+        };
     }
 
     public async Task<ScreenResponseDto?> GetScreenByIdAsync(int screenId)
@@ -45,11 +60,27 @@ public class ScreenService : IScreenService
         return MapToResponseDto(screen);
     }
 
-    public async Task<List<ScreenResponseDto>> GetScreensByTheatreIdAsync(int theatreId)
+    public async Task<PagedResponseDto<ScreenResponseDto>> GetScreensByTheatreIdAsync(
+    int theatreId,
+    PaginationParams paginationParams)
     {
-        var screens = await _screenRepository.GetByTheatreIdAsync(theatreId);
+        var pagedScreens = await _screenRepository.GetByTheatreIdAsync(
+                           theatreId,paginationParams);
 
-        return screens.Select(MapToResponseDto).ToList();
+        return new PagedResponseDto<ScreenResponseDto>
+        {
+            Data = pagedScreens.Data.Select(screen => new ScreenResponseDto
+            {
+                ScreenId = screen.ScreenId,
+                TheatreId = screen.TheatreId,
+                ScreenName = screen.ScreenName
+            }).ToList(),
+
+            PageNumber = pagedScreens.PageNumber,
+            PageSize = pagedScreens.PageSize,
+            TotalRecords = pagedScreens.TotalRecords,
+            TotalPages = pagedScreens.TotalPages
+        };
     }
 
     public async Task<ScreenResponseDto?> UpdateScreenAsync(

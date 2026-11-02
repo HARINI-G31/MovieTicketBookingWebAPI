@@ -1,4 +1,5 @@
 ﻿using MovieTicketBookingWebAPI.DTOs.Movies;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Services.Interfaces;
 
@@ -6,7 +7,8 @@ public interface IMovieService
 {
     Task<MovieResponseDto> CreateMovieAsync(CreateMovieDto movieDto);
 
-    Task<List<MovieResponseDto>> GetAllMoviesAsync();
+    Task<PagedResponseDto<MovieResponseDto>> GetAllMoviesAsync(
+    PaginationParams paginationParams);
 
     Task<MovieResponseDto?> GetMovieByIdAsync(int movieId);
 

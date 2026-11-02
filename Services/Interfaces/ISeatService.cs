@@ -3,6 +3,8 @@ using MovieTicketBookingWebAPI.DTOs.Seats;
 
 namespace MovieTicketBookingWebAPI.Services.Interfaces;
 
+using MovieTicketBookingWebAPI.DTOs.Common;
+
 public interface ISeatService
 {
     Task<SeatResponseDto> CreateSeatAsync(CreateSeatDto seatDto);
@@ -10,7 +12,9 @@ public interface ISeatService
     Task<List<SeatResponseDto>> CreateSeatsBulkAsync(
         List<CreateSeatDto> seatDtos);
 
-    Task<List<SeatResponseDto>> GetSeatsByScreenIdAsync(int screenId);
+    Task<PagedResponseDto<SeatResponseDto>> GetSeatsByScreenIdAsync(
+    int screenId,
+    PaginationParams paginationParams);
 
     Task<SeatResponseDto?> GetSeatByIdAsync(int seatId);
 

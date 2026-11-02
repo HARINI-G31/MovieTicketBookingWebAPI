@@ -1,4 +1,5 @@
 ﻿using MovieTicketBookingWebAPI.DTOs.Bookings;
+using MovieTicketBookingWebAPI.DTOs.Common;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
 using MovieTicketBookingWebAPI.Services.Interfaces;
@@ -76,15 +77,6 @@ public class BookingService : IBookingService
         return MapToResponseDto(createdBooking);
     }
 
-    public async Task<List<BookingResponseDto>> GetAllBookingsAsync(
-        int? showId,
-        string? status)
-    {
-        var bookings = await _bookingRepository.GetAllAsync(showId, status);
-
-        return bookings.Select(MapToResponseDto).ToList();
-    }
-
     public async Task<BookingResponseDto?> GetBookingByIdAsync(
         int bookingId)
     {
@@ -93,12 +85,28 @@ public class BookingService : IBookingService
         return booking == null ? null : MapToResponseDto(booking);
     }
 
-    public async Task<List<BookingResponseDto>> GetBookingsByShowIdAsync(
-        int showId)
+    public async Task<PagedResponseDto<BookingResponseDto>> GetAllBookingsAsync(
+    int? showId,
+    string? status,
+    PaginationParams paginationParams)
     {
-        var bookings = await _bookingRepository.GetByShowIdAsync(showId);
+        var pagedBookings = await _bookingRepository.GetAllAsync(
+            showId,
+            status,
+            paginationParams);
 
-        return bookings.Select(MapToResponseDto).ToList();
+        return MapPagedBookings(pagedBookings);
+    }
+
+    public async Task<PagedResponseDto<BookingResponseDto>> GetBookingsByShowIdAsync(
+        int showId,
+        PaginationParams paginationParams)
+    {
+        var pagedBookings = await _bookingRepository.GetByShowIdAsync(
+            showId,
+            paginationParams);
+
+        return MapPagedBookings(pagedBookings);
     }
 
     public async Task<BookingResponseDto?> CancelBookingAsync(
@@ -166,6 +174,21 @@ public class BookingService : IBookingService
                 SeatType = bs.Seat?.SeatType ?? string.Empty,
                 Price = bs.Price
             }).ToList()
+        };
+    }
+    private static PagedResponseDto<BookingResponseDto> MapPagedBookings(
+    PagedResponseDto<Booking> pagedBookings)
+    {
+        return new PagedResponseDto<BookingResponseDto>
+        {
+            Data = pagedBookings.Data
+                .Select(MapToResponseDto)
+                .ToList(),
+
+            PageNumber = pagedBookings.PageNumber,
+            PageSize = pagedBookings.PageSize,
+            TotalRecords = pagedBookings.TotalRecords,
+            TotalPages = pagedBookings.TotalPages
         };
     }
 }

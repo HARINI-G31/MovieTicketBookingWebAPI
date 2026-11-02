@@ -3,6 +3,7 @@ using MovieTicketBookingWebAPI.DTOs.Seats;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Services;
 
@@ -46,11 +47,29 @@ public class SeatService : ISeatService
         return createdSeats.Select(MapToResponseDto).ToList();
     }
 
-    public async Task<List<SeatResponseDto>> GetSeatsByScreenIdAsync(int screenId)
+    public async Task<PagedResponseDto<SeatResponseDto>> GetSeatsByScreenIdAsync(
+    int screenId,
+    PaginationParams paginationParams)
     {
-        var seats = await _seatRepository.GetByScreenIdAsync(screenId);
+        var pagedSeats = await _seatRepository.GetByScreenIdAsync(
+            screenId, paginationParams);
 
-        return seats.Select(MapToResponseDto).ToList();
+        return new PagedResponseDto<SeatResponseDto>
+        {
+            Data = pagedSeats.Data.Select(seat => new SeatResponseDto
+            {
+                SeatId = seat.SeatId,
+                ScreenId = seat.ScreenId,
+                RowName = seat.RowName,
+                SeatNumber = seat.SeatNumber,
+                SeatType = seat.SeatType
+            }).ToList(),
+
+            PageNumber = pagedSeats.PageNumber,
+            PageSize = pagedSeats.PageSize,
+            TotalRecords = pagedSeats.TotalRecords,
+            TotalPages = pagedSeats.TotalPages
+        };
     }
 
     public async Task<SeatResponseDto?> GetSeatByIdAsync(int seatId)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieTicketBookingWebAPI.DTOs.Bookings;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Controllers;
 
@@ -31,12 +32,14 @@ public class BookingsController : ControllerBase
     // GET: api/bookings
     [HttpGet]
     public async Task<IActionResult> GetAllBookings(
-        [FromQuery] int? showId,
-        [FromQuery] string? status)
+    [FromQuery] int? showId,
+    [FromQuery] string? status,
+    [FromQuery] PaginationParams paginationParams)
     {
         var bookings = await _bookingService.GetAllBookingsAsync(
             showId,
-            status);
+            status,
+            paginationParams);
 
         return Ok(bookings);
     }
@@ -60,10 +63,13 @@ public class BookingsController : ControllerBase
 
     // GET: api/bookings/show/5
     [HttpGet("show/{showId:int}")]
-    public async Task<IActionResult> GetBookingsByShowId(int showId)
+    public async Task<IActionResult> GetBookingsByShowId(
+    int showId,
+    [FromQuery] PaginationParams paginationParams)
     {
         var bookings = await _bookingService.GetBookingsByShowIdAsync(
-            showId);
+            showId,
+            paginationParams);
 
         return Ok(bookings);
     }

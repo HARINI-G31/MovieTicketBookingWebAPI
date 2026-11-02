@@ -2,6 +2,8 @@
 using MovieTicketBookingWebAPI.Data;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
+using MovieTicketBookingWebAPI.Extensions;
 
 namespace MovieTicketBookingWebAPI.Repositories;
 
@@ -22,11 +24,14 @@ public class MovieRepository : IMovieRepository
         return movie;
     }
 
-    public async Task<List<Movie>> GetAllAsync()
+    public async Task<PagedResponseDto<Movie>> GetAllAsync(
+    PaginationParams paginationParams)
     {
-        return await _context.Movies
+        var query = _context.Movies
             .AsNoTracking()
-            .ToListAsync();
+            .OrderBy(m => m.MovieId);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
     public async Task<Movie?> GetByIdAsync(int movieId)
@@ -45,5 +50,13 @@ public class MovieRepository : IMovieRepository
     {
         _context.Movies.Remove(movie);
         await _context.SaveChangesAsync();
+    }
+    public async Task<List<Movie>> SearchByTitleAsync(string title)
+    {
+        return await _context.Movies
+            .AsNoTracking()
+            .Where(m => m.Title.Contains(title))
+            .OrderBy(m => m.MovieId)
+            .ToListAsync();
     }
 }

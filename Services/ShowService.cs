@@ -2,6 +2,7 @@
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Services;
 
@@ -51,16 +52,7 @@ public class ShowService : IShowService
         return MapToResponseDto(createdShow);
     }
 
-    public async Task<List<ShowResponseDto>> GetAllShowsAsync(
-        DateTime? date,
-        int? movieId,
-        int? theatreId)
-    {
-        var shows = await _showRepository.GetAllAsync(
-            date, movieId, theatreId);
-
-        return shows.Select(MapToResponseDto).ToList();
-    }
+    
 
     public async Task<ShowResponseDto?> GetShowByIdAsync(int showId)
     {
@@ -69,28 +61,46 @@ public class ShowService : IShowService
         return show == null ? null : MapToResponseDto(show);
     }
 
-    public async Task<List<ShowResponseDto>> GetShowsByMovieIdAsync(
-        int movieId)
+    public async Task<PagedResponseDto<ShowResponseDto>> GetAllShowsAsync(
+    DateTime? date,
+    int? movieId,
+    int? theatreId,
+    PaginationParams paginationParams)
     {
-        var shows = await _showRepository.GetByMovieIdAsync(movieId);
+        var pagedShows = await _showRepository.GetAllAsync(
+            date, movieId, theatreId, paginationParams);
 
-        return shows.Select(MapToResponseDto).ToList();
+        return MapPagedShows(pagedShows);
     }
 
-    public async Task<List<ShowResponseDto>> GetShowsByTheatreIdAsync(
-        int theatreId)
+    public async Task<PagedResponseDto<ShowResponseDto>> GetShowsByMovieIdAsync(
+        int movieId,
+        PaginationParams paginationParams)
     {
-        var shows = await _showRepository.GetByTheatreIdAsync(theatreId);
+        var pagedShows = await _showRepository.GetByMovieIdAsync(
+            movieId, paginationParams);
 
-        return shows.Select(MapToResponseDto).ToList();
+        return MapPagedShows(pagedShows);
     }
 
-    public async Task<List<ShowResponseDto>> GetShowsByDateAsync(
-        DateTime date)
+    public async Task<PagedResponseDto<ShowResponseDto>> GetShowsByTheatreIdAsync(
+        int theatreId,
+        PaginationParams paginationParams)
     {
-        var shows = await _showRepository.GetByDateAsync(date);
+        var pagedShows = await _showRepository.GetByTheatreIdAsync(
+            theatreId, paginationParams);
 
-        return shows.Select(MapToResponseDto).ToList();
+        return MapPagedShows(pagedShows);
+    }
+
+    public async Task<PagedResponseDto<ShowResponseDto>> GetShowsByDateAsync(
+        DateTime date,
+        PaginationParams paginationParams)
+    {
+        var pagedShows = await _showRepository.GetByDateAsync(
+            date, paginationParams);
+
+        return MapPagedShows(pagedShows);
     }
 
     public async Task<ShowResponseDto?> UpdateShowAsync(
@@ -153,6 +163,27 @@ public class ShowService : IShowService
             StartTime = show.StartTime,
             EndTime = show.EndTime,
             TicketPrice = show.TicketPrice
+        };
+    }
+    private static PagedResponseDto<ShowResponseDto> MapPagedShows(
+    PagedResponseDto<Show> pagedShows)
+    {
+        return new PagedResponseDto<ShowResponseDto>
+        {
+            Data = pagedShows.Data.Select(show => new ShowResponseDto
+            {
+                ShowId = show.ShowId,
+                MovieId = show.MovieId,
+                ScreenId = show.ScreenId,
+                StartTime = show.StartTime,
+                EndTime = show.EndTime,
+                TicketPrice = show.TicketPrice
+            }).ToList(),
+
+            PageNumber = pagedShows.PageNumber,
+            PageSize = pagedShows.PageSize,
+            TotalRecords = pagedShows.TotalRecords,
+            TotalPages = pagedShows.TotalPages
         };
     }
 }

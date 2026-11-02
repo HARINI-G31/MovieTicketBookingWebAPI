@@ -1,4 +1,5 @@
 ﻿using MovieTicketBookingWebAPI.DTOs.Shows;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Services.Interfaces;
 
@@ -6,18 +7,25 @@ public interface IShowService
 {
     Task<ShowResponseDto> CreateShowAsync(CreateShowDto dto);
 
-    Task<List<ShowResponseDto>> GetAllShowsAsync(
+    Task<PagedResponseDto<ShowResponseDto>> GetAllShowsAsync(
         DateTime? date,
         int? movieId,
-        int? theatreId);
+        int? theatreId,
+        PaginationParams paginationParams);
 
     Task<ShowResponseDto?> GetShowByIdAsync(int showId);
 
-    Task<List<ShowResponseDto>> GetShowsByMovieIdAsync(int movieId);
+    Task<PagedResponseDto<ShowResponseDto>> GetShowsByMovieIdAsync(
+        int movieId,
+        PaginationParams paginationParams);
 
-    Task<List<ShowResponseDto>> GetShowsByTheatreIdAsync(int theatreId);
+    Task<PagedResponseDto<ShowResponseDto>> GetShowsByTheatreIdAsync(
+        int theatreId,
+        PaginationParams paginationParams);
 
-    Task<List<ShowResponseDto>> GetShowsByDateAsync(DateTime date);
+    Task<PagedResponseDto<ShowResponseDto>> GetShowsByDateAsync(
+        DateTime date,
+        PaginationParams paginationParams);
 
     Task<ShowResponseDto?> UpdateShowAsync(int showId, UpdateShowDto dto);
 

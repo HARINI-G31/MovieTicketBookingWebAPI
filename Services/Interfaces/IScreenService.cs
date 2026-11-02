@@ -3,15 +3,22 @@ using MovieTicketBookingWebAPI.DTOs.Screens;
 
 namespace MovieTicketBookingWebAPI.Services.Interfaces;
 
+using MovieTicketBookingWebAPI.DTOs.Common;
+
 public interface IScreenService
 {
     Task<ScreenResponseDto> CreateScreenAsync(CreateScreenDto screenDto);
 
-    Task<List<ScreenResponseDto>> GetAllScreensAsync();
+    Task<PagedResponseDto<ScreenResponseDto>> GetAllScreensAsync(
+    PaginationParams paginationParams);
+
+    Task<PagedResponseDto<ScreenResponseDto>> GetScreensByTheatreIdAsync(
+        int theatreId,
+        PaginationParams paginationParams);
 
     Task<ScreenResponseDto?> GetScreenByIdAsync(int screenId);
 
-    Task<List<ScreenResponseDto>> GetScreensByTheatreIdAsync(int theatreId);
+    
 
     Task<ScreenResponseDto?> UpdateScreenAsync(
         int screenId,

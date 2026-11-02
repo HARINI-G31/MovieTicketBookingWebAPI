@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using MovieTicketBookingWebAPI.Data;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
+using MovieTicketBookingWebAPI.Extensions;
 
 namespace MovieTicketBookingWebAPI.Repositories;
 
@@ -23,11 +25,14 @@ public class TheatreRepository : ITheatreRepository
         return theatre;
     }
 
-    public async Task<List<Theatre>> GetAllAsync()
+    public async Task<PagedResponseDto<Theatre>> GetAllAsync(
+    PaginationParams paginationParams)
     {
-        return await _context.Theatres
+        var query = _context.Theatres
             .AsNoTracking()
-            .ToListAsync();
+            .OrderBy(t => t.TheatreId);
+
+        return await query.ToPagedResponseAsync(paginationParams);
     }
 
     public async Task<Theatre?> GetByIdAsync(int theatreId)

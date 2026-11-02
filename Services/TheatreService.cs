@@ -3,6 +3,7 @@ using MovieTicketBookingWebAPI.DTOs.Theatres;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
 
 namespace MovieTicketBookingWebAPI.Services;
 
@@ -28,11 +29,25 @@ public class TheatreService : ITheatreService
         return MapToResponseDto(createdTheatre);
     }
 
-    public async Task<List<TheatreResponseDto>> GetAllTheatresAsync()
+    public async Task<PagedResponseDto<TheatreResponseDto>> GetAllTheatresAsync(
+    PaginationParams paginationParams)
     {
-        var theatres = await _theatreRepository.GetAllAsync();
+        var pagedTheatres = await _theatreRepository.GetAllAsync(paginationParams);
 
-        return theatres.Select(MapToResponseDto).ToList();
+        return new PagedResponseDto<TheatreResponseDto>
+        {
+            Data = pagedTheatres.Data.Select(theatre => new TheatreResponseDto
+            {
+                TheatreId = theatre.TheatreId,
+                Name = theatre.Name,
+                Location = theatre.Location
+            }).ToList(),
+
+            PageNumber = pagedTheatres.PageNumber,
+            PageSize = pagedTheatres.PageSize,
+            TotalRecords = pagedTheatres.TotalRecords,
+            TotalPages = pagedTheatres.TotalPages
+        };
     }
 
     public async Task<TheatreResponseDto?> GetTheatreByIdAsync(int theatreId)

@@ -11,4 +11,5 @@ public interface IShowSeatService
     Task<List<ShowSeatResponseDto>> GetAvailableSeatsAsync(int showId);
 
     Task<List<ShowSeatResponseDto>> GetBookedSeatsAsync(int showId);
+
 }

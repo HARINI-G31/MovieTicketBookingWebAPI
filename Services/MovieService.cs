@@ -2,6 +2,8 @@
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
 using MovieTicketBookingWebAPI.Services.Interfaces;
+using MovieTicketBookingWebAPI.DTOs.Common;
+
 
 namespace MovieTicketBookingWebAPI.Services;
 
@@ -31,11 +33,29 @@ public class MovieService : IMovieService
         return MapToResponseDto(createdMovie);
     }
 
-    public async Task<List<MovieResponseDto>> GetAllMoviesAsync()
+    public async Task<PagedResponseDto<MovieResponseDto>> GetAllMoviesAsync(
+    PaginationParams paginationParams)
     {
-        var movies = await _movieRepository.GetAllAsync();
+        var pagedMovies = await _movieRepository.GetAllAsync(paginationParams);
 
-        return movies.Select(MapToResponseDto).ToList();
+        return new PagedResponseDto<MovieResponseDto>
+        {
+            Data = pagedMovies.Data.Select(movie => new MovieResponseDto
+            {
+                MovieId = movie.MovieId,
+                Title = movie.Title,
+                Description = movie.Description,
+                DurationMinutes = movie.DurationMinutes,
+                ReleaseDate = movie.ReleaseDate,
+                Language = movie.Language,
+                Genre = movie.Genre
+            }).ToList(),
+
+            PageNumber = pagedMovies.PageNumber,
+            PageSize = pagedMovies.PageSize,
+            TotalRecords = pagedMovies.TotalRecords,
+            TotalPages = pagedMovies.TotalPages
+        };
     }
 
     public async Task<MovieResponseDto?> GetMovieByIdAsync(int movieId)
@@ -80,12 +100,9 @@ public class MovieService : IMovieService
 
     public async Task<List<MovieResponseDto>> SearchMoviesByTitleAsync(string title)
     {
-        var movies = await _movieRepository.GetAllAsync();
+        var movies = await _movieRepository.SearchByTitleAsync(title);
 
-        return movies
-            .Where(m => m.Title.Contains(title, StringComparison.OrdinalIgnoreCase))
-            .Select(MapToResponseDto)
-            .ToList();
+        return movies.Select(MapToResponseDto).ToList();
     }
 
     private static MovieResponseDto MapToResponseDto(Movie movie)
