@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Identity;
+using MovieTicketBookingWebAPI.Data.Seed;
 using Microsoft.EntityFrameworkCore;
 using MovieTicketBookingWebAPI.Data;
 using MovieTicketBookingWebAPI.Models;
@@ -98,6 +99,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    await RoleSeeder.SeedAsync( // for seeding the admin and manager passwords from User Secrets
+        app.Services,
+        app.Configuration);
 }
 
 app.UseHttpsRedirection();

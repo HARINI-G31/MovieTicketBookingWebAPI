@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MovieTicketBookingWebAPI.DTOs.Bookings;
-using MovieTicketBookingWebAPI.Services.Interfaces;
-using MovieTicketBookingWebAPI.DTOs.Common;
+﻿
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using MovieTicketBookingWebAPI.Constants;
+using MovieTicketBookingWebAPI.DTOs.Bookings;
+using MovieTicketBookingWebAPI.DTOs.Common;
+using MovieTicketBookingWebAPI.Services.Interfaces;
 
 namespace MovieTicketBookingWebAPI.Controllers;
 
@@ -20,10 +23,17 @@ public class BookingsController : ControllerBase
 
     // POST: api/bookings
     [HttpPost]
-    public async Task<IActionResult> CreateBooking(
-        CreateBookingDto dto)
+    [Authorize(Roles = UserRoles.Customer + "," + UserRoles.Admin)]
+    public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
-        var booking = await _bookingService.CreateBookingAsync(dto);
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var customerName = User.FindFirstValue(ClaimTypes.Name)!;
+        var customerEmail = User.FindFirstValue(ClaimTypes.Email)!;
+
+        var booking = await _bookingService.CreateBookingAsync(
+            dto, userId, customerName, customerEmail);
 
         return CreatedAtAction(
             nameof(GetBookingById),
@@ -33,31 +43,34 @@ public class BookingsController : ControllerBase
 
     // GET: api/bookings
     [HttpGet]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> GetAllBookings(
-    [FromQuery] int? showId,
-    [FromQuery] string? status,
-    [FromQuery] PaginationParams paginationParams)
+        [FromQuery] int? showId,
+        [FromQuery] string? status,
+        [FromQuery] PaginationParams paginationParams)
     {
         var bookings = await _bookingService.GetAllBookingsAsync(
-            showId,
-            status,
-            paginationParams);
+            showId, status, paginationParams);
 
         return Ok(bookings);
     }
 
     // GET: api/bookings/5
     [HttpGet("{id:int}")]
+    [Authorize(Roles = UserRoles.Customer + "," + UserRoles.Admin)]
     public async Task<IActionResult> GetBookingById(int id)
     {
-        var booking = await _bookingService.GetBookingByIdAsync(id);
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var isAdmin = User.IsInRole(UserRoles.Admin);
+
+        var booking = await _bookingService.GetBookingByIdAsync(
+            id, userId, isAdmin);
 
         if (booking == null)
         {
-            return NotFound(new
-            {
-                message = "Booking not found."
-            });
+            return NotFound(new { message = "Booking not found." });
         }
 
         return Ok(booking);
@@ -65,29 +78,33 @@ public class BookingsController : ControllerBase
 
     // GET: api/bookings/show/5
     [HttpGet("show/{showId:int}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> GetBookingsByShowId(
-    int showId,
-    [FromQuery] PaginationParams paginationParams)
+        int showId,
+        [FromQuery] PaginationParams paginationParams)
     {
         var bookings = await _bookingService.GetBookingsByShowIdAsync(
-            showId,
-            paginationParams);
+            showId, paginationParams);
 
         return Ok(bookings);
     }
 
     // PUT: api/bookings/5/cancel
     [HttpPut("{id:int}/cancel")]
+    [Authorize(Roles = UserRoles.Customer + "," + UserRoles.Admin)]
     public async Task<IActionResult> CancelBooking(int id)
     {
-        var booking = await _bookingService.CancelBookingAsync(id);
+        var userId = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var isAdmin = User.IsInRole(UserRoles.Admin);
+
+        var booking = await _bookingService.CancelBookingAsync(
+            id, userId, isAdmin);
 
         if (booking == null)
         {
-            return NotFound(new
-            {
-                message = "Booking not found."
-            });
+            return NotFound(new { message = "Booking not found." });
         }
 
         return Ok(booking);

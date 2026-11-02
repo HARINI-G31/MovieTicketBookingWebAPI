@@ -64,12 +64,17 @@ namespace MovieTicketBookingWebAPI.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("BookingId");
 
                     b.HasIndex("BookingReference")
                         .IsUnique();
 
                     b.HasIndex("ShowId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bookings", t =>
                         {
@@ -341,7 +346,15 @@ namespace MovieTicketBookingWebAPI.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MovieTicketBookingWebAPI.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Show");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MovieTicketBookingWebAPI.Models.BookingSeat", b =>

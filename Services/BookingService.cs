@@ -1,4 +1,5 @@
-﻿using MovieTicketBookingWebAPI.DTOs.Bookings;
+﻿
+using MovieTicketBookingWebAPI.DTOs.Bookings;
 using MovieTicketBookingWebAPI.DTOs.Common;
 using MovieTicketBookingWebAPI.Models;
 using MovieTicketBookingWebAPI.Repositories.Interfaces;
@@ -16,49 +17,42 @@ public class BookingService : IBookingService
     }
 
     public async Task<BookingResponseDto> CreateBookingAsync(
-        CreateBookingDto dto)
+        CreateBookingDto dto,
+        int userId,
+        string customerName,
+        string customerEmail)
     {
         if (dto.SeatIds == null || dto.SeatIds.Count == 0)
-        {
             throw new InvalidOperationException(
                 "At least one seat must be selected.");
-        }
 
         if (dto.SeatIds.Distinct().Count() != dto.SeatIds.Count)
-        {
             throw new InvalidOperationException(
                 "Duplicate seat selections are not allowed.");
-        }
 
         var show = await _bookingRepository.GetShowByIdAsync(dto.ShowId);
 
         if (show == null)
-        {
             throw new KeyNotFoundException("Show not found.");
-        }
 
         var showSeats = await _bookingRepository.GetShowSeatsByIdsAsync(
-            dto.ShowId,
-            dto.SeatIds);
+            dto.ShowId, dto.SeatIds);
 
         if (showSeats.Count != dto.SeatIds.Count)
-        {
             throw new InvalidOperationException(
                 "One or more selected seats do not belong to this show.");
-        }
 
         if (showSeats.Any(ss => ss.Status != "Available"))
-        {
             throw new InvalidOperationException(
                 "One or more selected seats are already booked.");
-        }
 
         var booking = new Booking
         {
             BookingReference = GenerateBookingReference(),
             ShowId = dto.ShowId,
-            CustomerName = dto.CustomerName,
-            CustomerEmail = dto.CustomerEmail,
+            UserId = userId,
+            CustomerName = customerName,
+            CustomerEmail = customerEmail,
             CustomerPhone = dto.CustomerPhone,
             BookingDate = DateTime.UtcNow,
             TotalAmount = show.TicketPrice * showSeats.Count,
@@ -71,29 +65,34 @@ public class BookingService : IBookingService
         };
 
         var createdBooking = await _bookingRepository.CreateAsync(
-            booking,
-            showSeats);
+            booking, showSeats);
 
         return MapToResponseDto(createdBooking);
     }
 
     public async Task<BookingResponseDto?> GetBookingByIdAsync(
-        int bookingId)
+        int bookingId,
+        int userId,
+        bool isAdmin)
     {
         var booking = await _bookingRepository.GetByIdAsync(bookingId);
 
-        return booking == null ? null : MapToResponseDto(booking);
+        if (booking == null)
+            return null;
+
+        if (!isAdmin && booking.UserId != userId)
+            return null;
+
+        return MapToResponseDto(booking);
     }
 
     public async Task<PagedResponseDto<BookingResponseDto>> GetAllBookingsAsync(
-    int? showId,
-    string? status,
-    PaginationParams paginationParams)
+        int? showId,
+        string? status,
+        PaginationParams paginationParams)
     {
         var pagedBookings = await _bookingRepository.GetAllAsync(
-            showId,
-            status,
-            paginationParams);
+            showId, status, paginationParams);
 
         return MapPagedBookings(pagedBookings);
     }
@@ -103,41 +102,38 @@ public class BookingService : IBookingService
         PaginationParams paginationParams)
     {
         var pagedBookings = await _bookingRepository.GetByShowIdAsync(
-            showId,
-            paginationParams);
+            showId, paginationParams);
 
         return MapPagedBookings(pagedBookings);
     }
 
     public async Task<BookingResponseDto?> CancelBookingAsync(
-        int bookingId)
+        int bookingId,
+        int userId,
+        bool isAdmin)
     {
         var booking = await _bookingRepository.GetByIdAsync(bookingId);
 
         if (booking == null)
-        {
             return null;
-        }
+
+        if (!isAdmin && booking.UserId != userId)
+            return null;
 
         if (booking.Status != "Confirmed")
-        {
             throw new InvalidOperationException(
                 "Only confirmed bookings can be cancelled.");
-        }
 
         var seatIds = booking.BookingSeats
             .Select(bs => bs.SeatId)
             .ToList();
 
         var showSeats = await _bookingRepository.GetShowSeatsByIdsAsync(
-            booking.ShowId,
-            seatIds);
+            booking.ShowId, seatIds);
 
         if (showSeats.Count != seatIds.Count)
-        {
             throw new InvalidOperationException(
                 "The booking's show seats could not be found.");
-        }
 
         await _bookingRepository.CancelAsync(booking, showSeats);
 
@@ -176,15 +172,13 @@ public class BookingService : IBookingService
             }).ToList()
         };
     }
+
     private static PagedResponseDto<BookingResponseDto> MapPagedBookings(
-    PagedResponseDto<Booking> pagedBookings)
+        PagedResponseDto<Booking> pagedBookings)
     {
         return new PagedResponseDto<BookingResponseDto>
         {
-            Data = pagedBookings.Data
-                .Select(MapToResponseDto)
-                .ToList(),
-
+            Data = pagedBookings.Data.Select(MapToResponseDto).ToList(),
             PageNumber = pagedBookings.PageNumber,
             PageSize = pagedBookings.PageSize,
             TotalRecords = pagedBookings.TotalRecords,

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using MovieTicketBookingWebAPI.Models;
 
 namespace MovieTicketBookingWebAPI.Data;
@@ -18,7 +19,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Show> Shows { get; set; }
     public DbSet<ShowSeat> ShowSeats { get; set; }
     public DbSet<Booking> Bookings { get; set; }
-
     public DbSet<BookingSeat> BookingSeats { get; set; }
     public DbSet<User> Users { get; set; }
 
@@ -26,12 +26,16 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // User configuration
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasIndex(u => u.Email)
+                .IsUnique();
+        });
+
+        // Movie configuration
         modelBuilder.Entity<Movie>(entity =>
         {
-            modelBuilder.Entity<User>() // Email ust be unique for each user
-               .HasIndex(u => u.Email)
-               .IsUnique();
-
             entity.HasKey(m => m.MovieId);
 
             entity.Property(m => m.Title)
@@ -64,6 +68,7 @@ public class ApplicationDbContext : DbContext
             });
         });
 
+        // Theatre configuration
         modelBuilder.Entity<Theatre>(entity =>
         {
             entity.HasKey(t => t.TheatreId);
@@ -76,6 +81,7 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(200)
                 .IsRequired();
         });
+
         // Screen configuration
         modelBuilder.Entity<Screen>(entity =>
         {
@@ -93,6 +99,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(s => new { s.TheatreId, s.ScreenName })
                 .IsUnique();
         });
+
         // Seat configuration
         modelBuilder.Entity<Seat>(entity =>
         {
@@ -126,6 +133,8 @@ public class ApplicationDbContext : DbContext
                 s.SeatNumber
             }).IsUnique();
         });
+
+        // Show configuration
         modelBuilder.Entity<Show>(entity =>
         {
             entity.HasKey(s => s.ShowId);
@@ -163,7 +172,8 @@ public class ApplicationDbContext : DbContext
                     "[TicketPrice] >= 0");
             });
         });
-        // ShowSeat Configuration
+
+        // ShowSeat configuration
         modelBuilder.Entity<ShowSeat>(entity =>
         {
             entity.HasKey(ss => ss.ShowSeatId);
@@ -185,6 +195,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(ss => new { ss.ShowId, ss.SeatId })
                 .IsUnique();
         });
+
         // Booking configuration
         modelBuilder.Entity<Booking>(entity =>
         {
@@ -228,6 +239,12 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(b => b.Show)
                 .WithMany(s => s.Bookings)
                 .HasForeignKey(b => b.ShowId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // User - Booking relationship
+            entity.HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

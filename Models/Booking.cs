@@ -1,4 +1,5 @@
-﻿namespace MovieTicketBookingWebAPI.Models;
+﻿
+namespace MovieTicketBookingWebAPI.Models;
 
 public class Booking
 {
@@ -7,6 +8,9 @@ public class Booking
     public string BookingReference { get; set; } = string.Empty;
 
     public int ShowId { get; set; }
+
+    // User relationship
+    public int UserId { get; set; }
 
     public string CustomerName { get; set; } = string.Empty;
 
@@ -22,6 +26,8 @@ public class Booking
 
     // Navigation properties
     public Show Show { get; set; } = null!;
+
+    public User User { get; set; }
 
     public ICollection<BookingSeat> BookingSeats { get; set; }
         = new List<BookingSeat>();
