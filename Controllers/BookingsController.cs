@@ -2,11 +2,13 @@
 using MovieTicketBookingWebAPI.DTOs.Bookings;
 using MovieTicketBookingWebAPI.Services.Interfaces;
 using MovieTicketBookingWebAPI.DTOs.Common;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MovieTicketBookingWebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class BookingsController : ControllerBase
 {
     private readonly IBookingService _bookingService;

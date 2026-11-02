@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Booking> Bookings { get; set; }
 
     public DbSet<BookingSeat> BookingSeats { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,6 +28,10 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Movie>(entity =>
         {
+            modelBuilder.Entity<User>() // Email ust be unique for each user
+               .HasIndex(u => u.Email)
+               .IsUnique();
+
             entity.HasKey(m => m.MovieId);
 
             entity.Property(m => m.Title)
